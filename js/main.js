@@ -299,51 +299,51 @@ function createButton(text, action) {
   return button;
 }
 
-// console.error = function (message) {
-//   toastr.options = {
-//     "closeButton": false,
-//     "debug": false,
-//     "newestOnTop": false,
-//     "progressBar": false,
-//     "positionClass": "toast-top-right",
-//     "preventDuplicates": false,
-//     "onclick": null,
-//     "showDuration": "300",
-//     "hideDuration": "1000",
-//     "timeOut": "5000",
-//     "extendedTimeOut": "1000",
-//     "showEasing": "swing",
-//     "hideEasing": "linear",
-//     "showMethod": "fadeIn",
-//     "hideMethod": "fadeOut"
-//   }
-//   toastr.error(message);
-// }
+console.error = function (message) {
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+  toastr.error(message);
+}
 
-// console.log = function (message, type = "info") {
-//   if (message.isArray || typeof message === "object") {
-//     console.warn(message);
-//   } else {
-//     toastr.options = {
-//       "closeButton": false,
-//       "debug": false,
-//       "newestOnTop": false,
-//       "progressBar": false,
-//       "positionClass": "toast-top-right",
-//       "preventDuplicates": false,
-//       "onclick": null,
-//       "showDuration": "300",
-//       "hideDuration": "1000",
-//       "timeOut": "5000",
-//       "extendedTimeOut": "1000",
-//       "showEasing": "swing",
-//       "hideEasing": "linear",
-//       "showMethod": "fadeIn",
-//       "hideMethod": "fadeOut"
-//     }
-//     toastr[type](message);
-//   }
-// }
+console.log = function (message, type = "info") {
+  if (message.isArray || typeof message === "object") {
+    console.warn(message);
+  } else {
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    toastr[type](message);
+  }
+}
 
 console.download = function (message, type = "info", timeOut = false) {
   if(!timeOut) {
