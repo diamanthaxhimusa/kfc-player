@@ -194,12 +194,12 @@ function removeContent(content) {
   return window.storage.remove(content.offlineUri);
 }
 
-function downloadContent(manifestUri, title) {
+function downloadContent(manifestUri) {
   // Construct a metadata object to be stored along side the content.
   // This can hold any information the app wants to be stored with the
   // content.
   var metadata = {
-    'title': title,
+    'title': manifestUri,
     'downloaded': Date()
   };
 
@@ -213,24 +213,18 @@ function downloadContent(manifestUri, title) {
  * complete.
  */
 async function donwloadVideos(array) {
-  console.warn("rinoriiiii", array)
   downloadInProgress = true;
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
 
   setDownloadProgress(null, 0);
-  // Download the content and then re-enable the download button so
-  // that more content can be downloaded.
   var index = 0;
   let newplaylist = [];
   for (element of array) {
-    // Promise.a
-    var name = element.video.name.split(' ').join('-');
-    // var url = `${corsUrl}${vidUrl}/storage/${element.video.id}/${element.video.file_name}`;
     var url = element.video_link;
     console.warn(url);
     console.download("Downloading: " + url +"\n Please wait...", "info", true);
-    await downloadContent(url, url)
+    await downloadContent(url)
       .then(function (e) {
         console.download("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
