@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Shaka Player compiled library: -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/2.4.5/shaka-player.compiled.js"></script>
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    .video-player {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .video-container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <span><progress id="progress-bar" value="0" max="100"></span> -->
+    <div class="video-container">
+      <video 
+        id="video"
+        class="video-player" 
+        poster="http://wallpapersdsc.net/wp-content/uploads/2016/09/KFC-4K.png"
+        autoPlay
+        controls
+        >
+      </video>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <!-- Application source: --> 
+    <script src="./js/main.js"></script>
+</body>
+</html>

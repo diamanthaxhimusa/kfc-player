@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <div class="registrationContainer">
+    <img id="img" src="https://wl3-cdn.landsec.com/sites/default/files/images/shops/logos/kfc.png" alt="Smiley face" />
+    <div class="panel">
+      <h1 class="setup">Set up the Screen</h1>
+      <div class="column">
+        <div class="inputSelect">
+          <span class="span">Select Location:</span>
+          <select wrap value={this.state.location} onChange={this.onLocationChange} class="picker">
+            <script>
+              ['Royal Mall', 'Albi Mall', 'Ferizaj Village', 'Emerald', 'Prizren', 'Gjilan'].map(item => (document.write(`<option value="${item}"">${item}</option>`)))
+            </script>
+          </select>
+        </div>
+        <div class="inputSelect">
+          <span class="span">Select Screen:</span>
+          <select wrap value={this.state.screen} onChange={this.onScreenChange} class="picker">
+            <script>
+              ['1', '2', '3', '4', '5', '6', '7', '8'].map(item => (document.write(`<option value="${item}"">${item}</option>`)))
+            </script>
+          </select>
+        </div>
+      </div>
+    </div>
+    <a class="button" href="./video.html">
+      Go
+    </a>
+  </div>
+</body>
+</html>
