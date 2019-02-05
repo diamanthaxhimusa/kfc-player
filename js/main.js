@@ -73,8 +73,8 @@ function initPlayer() {
 function initPlaylist() {
   console.log("gettting data");
   if (navigator.onLine) {
-    axios.get(`${corsUrl}${playlistUrl}`)
-      .then(data => {
+    axios.get(corsUrl+playlistUrl)
+      .then(function(data) {
         console.warn(data);
         const playlistData = data.data.data;
         const playlistUpdatedAt = playlistData.playlist.updated_at;
@@ -88,7 +88,7 @@ function initPlaylist() {
           playFromCache();
         }
       })
-      .catch(error => {
+      .catch(function(error) {
         console.error(error);
       })  
   } else {
@@ -101,8 +101,8 @@ function getPlaylist() {
   if (navigator.onLine) {
     if (!downloadInProgress) {
       console.log("Checking for new playlist.");
-      axios.get(`${corsUrl}${playlistUrl}`)
-        .then(data => {
+      axios.get(corsUrl+playlistUrl)
+        .then(function(data) {
           const playlistData = data.data.data;
           const playlistUpdatedAt = playlistData.playlist.updated_at;
           const lastupdated = window.localStorage.getItem('kfc_updated');
@@ -114,7 +114,7 @@ function getPlaylist() {
             console.log("There is no new playlist. Playing the old one");
           }
         })
-        .catch(error => {
+        .catch(function(error) {
           console.log(error, "error");
         })
     }
@@ -178,7 +178,7 @@ function initStorage(player) {
     progressCallback: setDownloadProgress,
     trackSelectionCallback: selectTracks
   });
-  window.storage.list().then(data => console.log(data));
+  window.storage.list().then(function(data){ console.log(data)});
   initPlaylist();
 }
 
@@ -212,7 +212,7 @@ function downloadContent(manifestUri) {
  * download, and refresh the content list once the download is
  * complete.
  */
-async function donwloadVideos(array) {
+function donwloadVideos(array) {
   downloadInProgress = true;
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
@@ -224,7 +224,7 @@ async function donwloadVideos(array) {
     var url = element.video_link;
     console.warn(url);
     console.download("Downloading: " + url +"\n Please wait...", "info", true);
-    await downloadContent(url)
+    downloadContent(url)
       .then(function (e) {
         console.download("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
@@ -250,7 +250,7 @@ async function donwloadVideos(array) {
 
 // Play the videos of latest playlist
 function saveToPlaylist(e) {
-  return new Promise((resolve, reject) => resolve(playlist.push(e)));
+  return new Promise(function(resolve, reject){ resolve(playlist.push(e)) });
 }
 
 /*
