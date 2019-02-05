@@ -212,7 +212,7 @@ function downloadContent(manifestUri) {
  * download, and refresh the content list once the download is
  * complete.
  */
-function donwloadVideos(array) {
+function donwloadVideos(playlistArray) {
   downloadInProgress = true;
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
@@ -220,8 +220,8 @@ function donwloadVideos(array) {
   setDownloadProgress(null, 0);
   var index = 0;
   var newplaylist = [];
-  for (element of array) {
-    var url = element.video_link;
+  for (var i = 0;i < playlistArray.length;i++) {
+    var url = playlistArray[i].video_link;
     console.warn(url);
     console.download("Downloading: " + url +"\n Please wait...", "info", true);
     downloadContent(url)
@@ -233,7 +233,7 @@ function donwloadVideos(array) {
       .then(function (content) {
         setDownloadProgress(null, 1);
         index++;
-        if (index == array.length) {
+        if (index == playlistArray.length) {
           window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
           media = newplaylist;
           console.log("Playing the new playlist now!", "success");
