@@ -76,9 +76,9 @@ function initPlaylist() {
     axios.get(corsUrl+playlistUrl)
       .then(function(data) {
         console.warn(data);
-        const playlistData = data.data.data;
-        const playlistUpdatedAt = playlistData.playlist.updated_at;
-        const lastupdated = window.localStorage.getItem('kfc_updated');
+        var playlistData = data.data.data;
+        var playlistUpdatedAt = playlistData.playlist.updated_at;
+        var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
           console.log("New videos! Downloading now...", "success");
           window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
@@ -103,9 +103,9 @@ function getPlaylist() {
       console.log("Checking for new playlist.");
       axios.get(corsUrl+playlistUrl)
         .then(function(data) {
-          const playlistData = data.data.data;
-          const playlistUpdatedAt = playlistData.playlist.updated_at;
-          const lastupdated = window.localStorage.getItem('kfc_updated');
+          var playlistData = data.data.data;
+          var playlistUpdatedAt = playlistData.playlist.updated_at;
+          var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
             console.log("New videos! Downloading now...", "success");
             window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
@@ -125,7 +125,7 @@ function getPlaylist() {
 
 
 function playFromCache() {
-  let cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
+  var cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
   media = cachedplaylist.playlist;
   player.load(media[vidId].offlineUri);
 }
@@ -219,7 +219,7 @@ function donwloadVideos(array) {
 
   setDownloadProgress(null, 0);
   var index = 0;
-  let newplaylist = [];
+  var newplaylist = [];
   for (element of array) {
     var url = element.video_link;
     console.warn(url);
