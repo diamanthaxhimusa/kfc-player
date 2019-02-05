@@ -223,10 +223,10 @@ function donwloadVideos(playlistArray) {
   for (var i = 0;i < playlistArray.length;i++) {
     var url = playlistArray[i].video_link;
     console.warn(url);
-    console.download("Downloading: " + url +"\n Please wait...", "info", true);
+    console.log("Downloading: " + url +"\n Please wait...", "info", true);
     downloadContent(url)
       .then(function (e) {
-        console.download("Dowloaded! \n" +url + " \n", "success", false);
+        console.log("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
         return saveToPlaylist(e);
       })
@@ -299,74 +299,74 @@ function createButton(text, action) {
   return button;
 }
 
-console.error = function (message) {
-  toastr.options = {
-    "closeButton": false,
-    "debug": false,
-    "newestOnTop": false,
-    "progressBar": false,
-    "positionClass": "toast-top-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "5000",
-    "extendedTimeOut": "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-  }
-  toastr.error(message);
-}
+// console.error = function (message) {
+//   toastr.options = {
+//     "closeButton": false,
+//     "debug": false,
+//     "newestOnTop": false,
+//     "progressBar": false,
+//     "positionClass": "toast-top-right",
+//     "preventDuplicates": false,
+//     "onclick": null,
+//     "showDuration": "300",
+//     "hideDuration": "1000",
+//     "timeOut": "5000",
+//     "extendedTimeOut": "1000",
+//     "showEasing": "swing",
+//     "hideEasing": "linear",
+//     "showMethod": "fadeIn",
+//     "hideMethod": "fadeOut"
+//   }
+//   toastr.error(message);
+// }
 
-console.log = function (message, type = "info") {
-  if (message.isArray || typeof message === "object") {
-    console.warn(message);
-  } else {
-    toastr.options = {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
-    toastr[type](message);
-  }
-}
+// console.log = function (message, type = "info") {
+//   if (message.isArray || typeof message === "object") {
+//     console.warn(message);
+//   } else {
+//     toastr.options = {
+//       "closeButton": false,
+//       "debug": false,
+//       "newestOnTop": false,
+//       "progressBar": false,
+//       "positionClass": "toast-top-right",
+//       "preventDuplicates": false,
+//       "onclick": null,
+//       "showDuration": "300",
+//       "hideDuration": "1000",
+//       "timeOut": "5000",
+//       "extendedTimeOut": "1000",
+//       "showEasing": "swing",
+//       "hideEasing": "linear",
+//       "showMethod": "fadeIn",
+//       "hideMethod": "fadeOut"
+//     }
+//     toastr[type](message);
+//   }
+// }
 
-console.download = function (message, type = "info", timeOut = false) {
-  if(!timeOut) {
-    toastr.clear();
-  }
-  toastr[type](message, "", {
-    "closeButton": false,
-    "debug": false,
-    "newestOnTop": false,
-    "progressBar": false,
-    "positionClass": "toast-top-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": timeOut ? 0 : "5000",
-    "extendedTimeOut": timeOut ? 0 : "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-  });
-}
+// console.download = function (message, type = "info", timeOut = false) {
+//   if(!timeOut) {
+//     toastr.clear();
+//   }
+//   toastr[type](message, "", {
+//     "closeButton": false,
+//     "debug": false,
+//     "newestOnTop": false,
+//     "progressBar": false,
+//     "positionClass": "toast-top-right",
+//     "preventDuplicates": false,
+//     "onclick": null,
+//     "showDuration": "300",
+//     "hideDuration": "1000",
+//     "timeOut": timeOut ? 0 : "5000",
+//     "extendedTimeOut": timeOut ? 0 : "1000",
+//     "showEasing": "swing",
+//     "hideEasing": "linear",
+//     "showMethod": "fadeIn",
+//     "hideMethod": "fadeOut"
+//   });
+// }
 
 window.setInterval(function () {
   /// call your function here
