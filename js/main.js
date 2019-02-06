@@ -21,7 +21,7 @@ function initApp() {
     initPlayer();
   } else {
     // This browser does not have the minimum set of APIs we need.
-    console.log('Browser not supported!', "error");
+    log('Browser not supported!', "error");
   }
 
   // Update the online status and add listeners so that we can visualize
@@ -62,7 +62,7 @@ function initPlayer() {
 
 
 function initPlaylist() {
-  console.log("gettting data");
+  log("gettting data");
   if (navigator.onLine) {
     $.ajax({
       url: corsUrl+playlistUrl,
@@ -74,11 +74,11 @@ function initPlaylist() {
         var playlistUpdatedAt = playlistData.playlist.updated_at;
         var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
-          console.log("New videos! Downloading now...", "success");
+          log("New videos! Downloading now...", "success");
           window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
           donwloadVideos(playlistData.playlist.media);
         } else {
-          console.log("No new playlist. Playing from cache.", "warning");;
+          log("No new playlist. Playing from cache.", "warning");;
           playFromCache();
         }
       },
@@ -87,7 +87,7 @@ function initPlaylist() {
       }
     });  
   } else {
-    console.log("Offline! Loading videos from cache", "warning");
+    log("Offline! Loading videos from cache", "warning");
     playFromCache();
   }
 }
@@ -95,7 +95,7 @@ function initPlaylist() {
 function getPlaylist() {
   if (navigator.onLine) {
     if (!downloadInProgress) {
-      console.log("Checking for new playlist.");
+      log("Checking for new playlist.");
       $.ajax({
         url: corsUrl+playlistUrl,
         type: 'GET',
@@ -105,20 +105,20 @@ function getPlaylist() {
           var playlistUpdatedAt = playlistData.playlist.updated_at;
           var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
-            console.log("New videos! Downloading now...", "success");
+            log("New videos! Downloading now...", "success");
             window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
             donwloadVideos(playlistData.playlist.media);
           } else {
-            console.log("There is no new playlist. Playing the old one");
+            log("There is no new playlist. Playing the old one");
           }
         },
         error: function(error) {
-          console.log(error, "error");
+          log(error, "error");
         }
       });
     }
   } else {
-    console.log("Offline!", "error");
+    log("Offline!", "error");
   }
 }
 
@@ -131,11 +131,11 @@ function playFromCache() {
 
 
 function offline() {
-  console.log("You are offline!");
+  log("You are offline!");
 }
 
 function online() {
-  console.log("You are back online!");
+  log("You are back online!");
   // setTimeout(getPlaylist(), 10000);
 }
 
@@ -155,7 +155,7 @@ function onErrorEvent(event) {
 
 function onError(error) {
   // Log the error.
-  console.log('Error code :' + error.code + '; Data:' + error.data, "error");
+  log('Error code :' + error.code + '; Data:' + error.data, "error");
 }
 
 function selectTracks(tracks) {
@@ -164,7 +164,7 @@ function selectTracks(tracks) {
     .filter(function (track) { return track.type == 'variant'; })
     .sort(function (a, b) { return a.bandwidth - b.bandwidth; })
     .pop();
-  console.log('Offline Track bandwidth: ' + found.bandwidth);
+  log('Offline Track bandwidth: ' + found.bandwidth);
   return [found];
 }
 
@@ -177,7 +177,7 @@ function initStorage(player) {
     progressCallback: setDownloadProgress,
     trackSelectionCallback: selectTracks
   });
-  window.storage.list().then(function(data){ console.log(data)});
+  window.storage.list().then(function(data){ log(data)});
   initPlaylist();
 }
 
@@ -222,10 +222,10 @@ function donwloadVideos(playlistArray) {
   for (var i = 0;i < playlistArray.length;i++) {
     var url = playlistArray[i].video_link;
     console.warn(url);
-    console.log("Downloading: " + url +"\n Please wait...", "info", true);
+    log("Downloading: " + url +"\n Please wait...", "info", true);
     downloadContent(url)
       .then(function (e) {
-        console.log("Dowloaded! \n" +url + " \n", "success", false);
+        log("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
         return saveToPlaylist(e);
       })
@@ -235,13 +235,13 @@ function donwloadVideos(playlistArray) {
         if (index == playlistArray.length) {
           window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
           media = newplaylist;
-          console.log("Playing the new playlist now!", "success");
+          log("Playing the new playlist now!", "success");
           downloadInProgress = false;
           player.load(media[vidId].offlineUri);
         }
       })
       .catch(function (error) {
-        console.log(error);
+        log(error);
         onError(error);
       });
   };
@@ -258,9 +258,9 @@ function saveToPlaylist(e) {
  */
 function updateOnlineStatus() {
   if (navigator.onLine) {
-    console.log("Online", "success");
+    log("Online", "success");
   } else {
-    console.log("Offline", "error");
+    log("Offline", "error");
   }
 }
 
@@ -281,7 +281,7 @@ function setDownloadProgress(content, progress) {
 function refreshContentList() {
   return listContent()
     .then(function (content) { 
-      console.log(content)
+      log(content)
       media.push(content);
       // content.forEach(addRow); 
     });
@@ -319,32 +319,32 @@ function createButton(text, action) {
 //   toastr.error(message);
 // }
 
-// console.log = function (message, type = "info") {
-//   if (message.isArray || typeof message === "object") {
-//     console.warn(message);
-//   } else {
-//     toastr.options = {
-//       "closeButton": false,
-//       "debug": false,
-//       "newestOnTop": false,
-//       "progressBar": false,
-//       "positionClass": "toast-top-right",
-//       "preventDuplicates": false,
-//       "onclick": null,
-//       "showDuration": "300",
-//       "hideDuration": "1000",
-//       "timeOut": "5000",
-//       "extendedTimeOut": "1000",
-//       "showEasing": "swing",
-//       "hideEasing": "linear",
-//       "showMethod": "fadeIn",
-//       "hideMethod": "fadeOut"
-//     }
-//     toastr[type](message);
-//   }
-// }
+function log(message, type = "info") {
+  if (message.isArray || typeof message === "object") {
+    console.warn(message);
+  } else {
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    toastr[type](message);
+  }
+}
 
-// console.download = function (message, type = "info", timeOut = false) {
+// function download (message, type = "info", timeOut = false) {
 //   if(!timeOut) {
 //     toastr.clear();
 //   }
@@ -370,7 +370,7 @@ function createButton(text, action) {
 window.setInterval(function () {
   /// call your function here
   getPlaylist();
-}, 10000);
+}, 40000);
 
 
 document.addEventListener('DOMContentLoaded', initApp);
