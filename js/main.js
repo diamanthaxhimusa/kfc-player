@@ -319,7 +319,10 @@ function createButton(text, action) {
 //   toastr.error(message);
 // }
 
-function log(message, type = "info") {
+function log(message, type) {
+  if (!type) {
+    type = "info"
+  }
   if (message.isArray || typeof message === "object") {
     console.warn(message);
   } else {
