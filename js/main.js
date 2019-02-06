@@ -3,24 +3,15 @@ var playlist = [];
 var vidId = 0;
 var vidUrl = "https://kfc.urbanway.net";
 var corsUrl = "https://cors-anywhere.herokuapp.com/";
-// var playlistUrl = "https://kfc.urbanway.net/api/v1/screen/";
 var playlistUrl = "https://my-json-server.typicode.com/diamanthaxhimusa/kfcadmin/db";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
-var vid3 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
-var vid4 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
-var playlist1 = [vid2, vid2];
-var downloadButton;
-var downloadButton2;
-
 var downloadInProgress = false;
 
 function initApp() {
   dw1 = document.getElementById('download-button');
   dw2 = document.getElementById('dwnbtn');
 
-  // dw1.addEventListener("click", function() {donwloadVideos(playlist1)});
-  // dw2.addEventListener("click", function() {donwloadVideos(playlist2)});
   // Install built-in polyfills to patch browser incompatibilities.
   shaka.polyfill.installAll();
 
@@ -73,8 +64,11 @@ function initPlayer() {
 function initPlaylist() {
   console.log("gettting data");
   if (navigator.onLine) {
-    axios.get(corsUrl+playlistUrl)
-      .then(function(data) {
+    $.ajax({
+      url: corsUrl+playlistUrl,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
         console.warn(data);
         var playlistData = data.data.data;
         var playlistUpdatedAt = playlistData.playlist.updated_at;
@@ -87,10 +81,11 @@ function initPlaylist() {
           console.log("No new playlist. Playing from cache.", "warning");;
           playFromCache();
         }
-      })
-      .catch(function(error) {
+      },
+      error: function(error) {
         console.error(error);
-      })  
+      }
+    });  
   } else {
     console.log("Offline! Loading videos from cache", "warning");
     playFromCache();
@@ -101,8 +96,11 @@ function getPlaylist() {
   if (navigator.onLine) {
     if (!downloadInProgress) {
       console.log("Checking for new playlist.");
-      axios.get(corsUrl+playlistUrl)
-        .then(function(data) {
+      $.ajax({
+        url: corsUrl+playlistUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
           var playlistData = data.data.data;
           var playlistUpdatedAt = playlistData.playlist.updated_at;
           var lastupdated = window.localStorage.getItem('kfc_updated');
@@ -113,10 +111,11 @@ function getPlaylist() {
           } else {
             console.log("There is no new playlist. Playing the old one");
           }
-        })
-        .catch(function(error) {
+        },
+        error: function(error) {
           console.log(error, "error");
-        })
+        }
+      });
     }
   } else {
     console.log("Offline!", "error");
