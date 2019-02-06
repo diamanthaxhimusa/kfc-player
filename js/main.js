@@ -70,7 +70,7 @@ function initPlaylist() {
       dataType: 'json',
       success: function(data) {
         console.warn(data);
-        var playlistData = data.data.data;
+        var playlistData = data.data;
         var playlistUpdatedAt = playlistData.playlist.updated_at;
         var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
@@ -101,7 +101,7 @@ function getPlaylist() {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-          var playlistData = data.data.data;
+          var playlistData = data.data;
           var playlistUpdatedAt = playlistData.playlist.updated_at;
           var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
