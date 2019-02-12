@@ -3,24 +3,15 @@ var playlist = [];
 var vidId = 0;
 var vidUrl = "https://kfc.urbanway.net";
 var corsUrl = "https://cors-anywhere.herokuapp.com/";
-// var playlistUrl = "https://kfc.urbanway.net/api/v1/screen/";
 var playlistUrl = "https://my-json-server.typicode.com/diamanthaxhimusa/kfcadmin/db";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
-var vid3 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
-var vid4 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
-var playlist1 = [vid2, vid2];
-var downloadButton;
-var downloadButton2;
-
 var downloadInProgress = false;
 
 function initApp() {
   dw1 = document.getElementById('download-button');
   dw2 = document.getElementById('dwnbtn');
 
-  // dw1.addEventListener("click", function() {donwloadVideos(playlist1)});
-  // dw2.addEventListener("click", function() {donwloadVideos(playlist2)});
   // Install built-in polyfills to patch browser incompatibilities.
   shaka.polyfill.installAll();
 
@@ -30,7 +21,7 @@ function initApp() {
     initPlayer();
   } else {
     // This browser does not have the minimum set of APIs we need.
-    console.log('Browser not supported!', "error");
+    log('Browser not supported!', "error");
   }
 
   // Update the online status and add listeners so that we can visualize
@@ -71,28 +62,32 @@ function initPlayer() {
 
 
 function initPlaylist() {
-  console.log("gettting data");
+  log("gettting data");
   if (navigator.onLine) {
-    axios.get(`${corsUrl}${playlistUrl}`)
-      .then(data => {
+    $.ajax({
+      url: corsUrl+playlistUrl,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
         console.warn(data);
-        const playlistData = data.data.data;
-        const playlistUpdatedAt = playlistData.playlist.updated_at;
-        const lastupdated = window.localStorage.getItem('kfc_updated');
+        var playlistData = data.data;
+        var playlistUpdatedAt = playlistData.playlist.updated_at;
+        var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
-          console.log("New videos! Downloading now...", "success");
+          log("New videos! Downloading now...", "success");
           window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
           donwloadVideos(playlistData.playlist.media);
         } else {
-          console.log("No new playlist. Playing from cache.", "warning");;
+          log("No new playlist. Playing from cache.", "warning");;
           playFromCache();
         }
-      })
-      .catch(error => {
+      },
+      error: function(error) {
         console.error(error);
-      })  
+      }
+    });  
   } else {
-    console.log("Offline! Loading videos from cache", "warning");
+    log("Offline! Loading videos from cache", "warning");
     playFromCache();
   }
 }
@@ -100,12 +95,15 @@ function initPlaylist() {
 function getPlaylist() {
   if (navigator.onLine) {
     if (!downloadInProgress) {
-      console.log("Checking for new playlist.");
-      axios.get(`${corsUrl}${playlistUrl}`)
-        .then(data => {
-          const playlistData = data.data.data;
-          const playlistUpdatedAt = playlistData.playlist.updated_at;
-          const lastupdated = window.localStorage.getItem('kfc_updated');
+      log("Checking for new playlist.");
+      $.ajax({
+        url: corsUrl+playlistUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          var playlistData = data.data;
+          var playlistUpdatedAt = playlistData.playlist.updated_at;
+          var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
             if (playlistData.playlist.type === "photo") {
               var poster = playlistData.playlist.media[0].image_url;
@@ -117,32 +115,33 @@ function getPlaylist() {
               donwloadVideos(playlistData.playlist.media);
             }
           } else {
-            console.log("There is no new playlist. Playing the old one");
+            log("There is no new playlist. Playing the old one");
           }
-        })
-        .catch(error => {
-          console.log(error, "error");
-        })
+        },
+        error: function(error) {
+          log(error, "error");
+        }
+      });
     }
   } else {
-    console.log("Offline!", "error");
+    log("Offline!", "error");
   }
 }
 
 
 function playFromCache() {
-  let cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
+  var cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
   media = cachedplaylist.playlist;
   player.load(media[vidId].offlineUri);
 }
 
 
 function offline() {
-  console.log("You are offline!");
+  log("You are offline!");
 }
 
 function online() {
-  console.log("You are back online!");
+  log("You are back online!");
   // setTimeout(getPlaylist(), 10000);
 }
 
@@ -162,7 +161,7 @@ function onErrorEvent(event) {
 
 function onError(error) {
   // Log the error.
-  console.log('Error code :' + error.code + '; Data:' + error.data, "error");
+  log('Error code :' + error.code + '; Data:' + error.data, "error");
 }
 
 function selectTracks(tracks) {
@@ -171,7 +170,7 @@ function selectTracks(tracks) {
     .filter(function (track) { return track.type == 'variant'; })
     .sort(function (a, b) { return a.bandwidth - b.bandwidth; })
     .pop();
-  console.log('Offline Track bandwidth: ' + found.bandwidth);
+  log('Offline Track bandwidth: ' + found.bandwidth);
   return [found];
 }
 
@@ -184,7 +183,7 @@ function initStorage(player) {
     progressCallback: setDownloadProgress,
     trackSelectionCallback: selectTracks
   });
-  window.storage.list().then(data => console.log(data));
+  window.storage.list().then(function(data){ log(data)});
   initPlaylist();
 }
 
@@ -218,37 +217,37 @@ function downloadContent(manifestUri) {
  * download, and refresh the content list once the download is
  * complete.
  */
-async function donwloadVideos(array) {
+function donwloadVideos(playlistArray) {
   downloadInProgress = true;
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
 
   setDownloadProgress(null, 0);
   var index = 0;
-  let newplaylist = [];
-  for (element of array) {
-    var url = element.video_link;
+  var newplaylist = [];
+  for (var i = 0;i < playlistArray.length;i++) {
+    var url = playlistArray[i].video_link;
     console.warn(url);
-    console.download("Downloading: " + url +"\n Please wait...", "info", true);
-    await downloadContent(url)
+    log("Downloading: " + url +"\n Please wait...", "info", true);
+    downloadContent(url)
       .then(function (e) {
-        console.download("Dowloaded! \n" +url + " \n", "success", false);
+        log("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
         return saveToPlaylist(e);
       })
       .then(function (content) {
         setDownloadProgress(null, 1);
         index++;
-        if (index == array.length) {
+        if (index == playlistArray.length) {
           window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
           media = newplaylist;
-          console.log("Playing the new playlist now!", "success");
+          log("Playing the new playlist now!", "success");
           downloadInProgress = false;
           player.load(media[vidId].offlineUri);
         }
       })
       .catch(function (error) {
-        console.log(error);
+        log(error);
         onError(error);
       });
   };
@@ -256,7 +255,7 @@ async function donwloadVideos(array) {
 
 // Play the videos of latest playlist
 function saveToPlaylist(e) {
-  return new Promise((resolve, reject) => resolve(playlist.push(e)));
+  return new Promise(function(resolve, reject){ resolve(playlist.push(e)) });
 }
 
 /*
@@ -265,9 +264,9 @@ function saveToPlaylist(e) {
  */
 function updateOnlineStatus() {
   if (navigator.onLine) {
-    console.log("Online", "success");
+    log("Online", "success");
   } else {
-    console.log("Offline", "error");
+    log("Offline", "error");
   }
 }
 
@@ -288,7 +287,7 @@ function setDownloadProgress(content, progress) {
 function refreshContentList() {
   return listContent()
     .then(function (content) { 
-      console.log(content)
+      log(content)
       media.push(content);
       // content.forEach(addRow); 
     });
@@ -305,23 +304,30 @@ function createButton(text, action) {
   return button;
 }
 
-console.error = function (message) {
-  toastr.options = {
-    "closeButton": false,
-    "debug": false,
-    "newestOnTop": false,
-    "progressBar": false,
-    "positionClass": "toast-top-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "5000",
-    "extendedTimeOut": "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
+// console.error = function (message) {
+//   toastr.options = {
+//     "closeButton": false,
+//     "debug": false,
+//     "newestOnTop": false,
+//     "progressBar": false,
+//     "positionClass": "toast-top-right",
+//     "preventDuplicates": false,
+//     "onclick": null,
+//     "showDuration": "300",
+//     "hideDuration": "1000",
+//     "timeOut": "5000",
+//     "extendedTimeOut": "1000",
+//     "showEasing": "swing",
+//     "hideEasing": "linear",
+//     "showMethod": "fadeIn",
+//     "hideMethod": "fadeOut"
+//   }
+//   toastr.error(message);
+// }
+
+function log(message, type) {
+  if (!type) {
+    type = "info"
   }
   toastr.error(message);
 }
@@ -380,7 +386,7 @@ console.download = function (message, type, timeOut) {
 window.setInterval(function () {
   /// call your function here
   getPlaylist();
-}, 10000);
+}, 40000);
 
 // dT = new Date(Date.now() + 1 * 60000) - new Date();
 // dT = new Date("Sun Feb 10 2019 14:45:21 GMT+0100 (CET)") - new Date();
