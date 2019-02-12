@@ -107,9 +107,15 @@ function getPlaylist() {
           const playlistUpdatedAt = playlistData.playlist.updated_at;
           const lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
-            console.log("New videos! Downloading now...", "success");
-            window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
-            donwloadVideos(playlistData.playlist.media);
+            if (playlistData.playlist.type === "photo") {
+              var poster = playlistData.playlist.media[0].image_url;
+              $("#video").attr("poster", poster);
+              $("#video").attr("src", "");
+            } else {
+              console.log("New videos! Downloading now...", "success");
+              window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
+              donwloadVideos(playlistData.playlist.media);
+            }
           } else {
             console.log("There is no new playlist. Playing the old one");
           }
@@ -320,7 +326,7 @@ console.error = function (message) {
   toastr.error(message);
 }
 
-console.log = function (message, type = "info") {
+console.log = function (message, type) {
   if (message.isArray || typeof message === "object") {
     console.warn(message);
   } else {
@@ -341,14 +347,17 @@ console.log = function (message, type = "info") {
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
     }
+    if (!type) type = "info";
     toastr[type](message);
   }
 }
 
-console.download = function (message, type = "info", timeOut = false) {
+console.download = function (message, type, timeOut) {
   if(!timeOut) {
     toastr.clear();
   }
+  if (!type) type = "info";
+  if (!timeOut) timeOut = false;
   toastr[type](message, "", {
     "closeButton": false,
     "debug": false,
@@ -373,5 +382,8 @@ window.setInterval(function () {
   getPlaylist();
 }, 10000);
 
+// dT = new Date(Date.now() + 1 * 60000) - new Date();
+// dT = new Date("Sun Feb 10 2019 14:45:21 GMT+0100 (CET)") - new Date();
+// setTimeout(alert, dT, "time's up!")
 
 document.addEventListener('DOMContentLoaded', initApp);
