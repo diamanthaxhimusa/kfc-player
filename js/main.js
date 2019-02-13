@@ -218,40 +218,42 @@ function downloadContent(manifestUri) {
  * complete.
  */
 
-function donwloadVideos(playlistArray) {
-   // Disable the download button to prevent user from requesting
-   // another download until this download is complete.
-
-  setDownloadProgress(null, 0);
-  var index = 0;
-  var newplaylist = [];
-  do {
+function donwloadVideos(playlistArray, index) {
+  // Disable the download button to prevent user from requesting
+  // another download until this download is complete.
+  var index = index;
+  if (!index) index = 0;
+  if (index < playlistArray.length && !downloadInProgress) {
+    setDownloadProgress(null, 0);
+    var newplaylist = [];
     downloadInProgress = true;
     var url = playlistArray[index].video_link;
     console.warn(url);
-    downloadLog("Downloading: " + url +"\n Please wait...", "info", true);
+    downloadLog("Downloading: " + url + "\n Please wait...", "info", true);
     downloadContent(url)
       .then(function (e) {
-        downloadLog("Dowloaded! \n" +url + " \n", "success", false);
+        downloadLog("Dowloaded! \n" + url + " \n", "success", false);
         newplaylist.push(e);
         return saveToPlaylist(e);
       })
       .then(function (content) {
-        setDownloadProgress(null, 1);
-        index++;
+        // setDownloadProgress(null, 1);
+        index = index + 1;
         if (index == playlistArray.length) {
           window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
           media = newplaylist;
           log("Playing the new playlist now!", "success");
-          downloadInProgress = false;
           player.load(media[vidId].offlineUri);
+        } else {
+          downloadInProgress = false;
+          donwloadVideos(playlistArray, index);
         }
       })
       .catch(function (error) {
         log(error);
         onError(error);
       });
-  } while (index < playlistArray.length && !downloadInProgress);
+  }
 }
 
 // Play the videos of latest playlist
