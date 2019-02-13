@@ -110,7 +110,7 @@ function getPlaylist() {
               $("#video").attr("poster", poster);
               $("#video").attr("src", "");
             } else {
-              console.log("New videos! Downloading now...", "success");
+              log("New videos! Downloading now...", "success");
               window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
               donwloadVideos(playlistData.playlist.media);
             }
@@ -217,7 +217,8 @@ function downloadContent(manifestUri) {
  * download, and refresh the content list once the download is
  * complete.
  */
-function donwloadVideos(playlistArray) {
+
+async function donwloadVideos(playlistArray) {
   downloadInProgress = true;
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
@@ -228,10 +229,10 @@ function donwloadVideos(playlistArray) {
   for (var i = 0;i < playlistArray.length;i++) {
     var url = playlistArray[i].video_link;
     console.warn(url);
-    log("Downloading: " + url +"\n Please wait...", "info", true);
-    downloadContent(url)
+    downloadLog("Downloading: " + url +"\n Please wait...", "info", true);
+    await downloadContent(url)
       .then(function (e) {
-        log("Dowloaded! \n" +url + " \n", "success", false);
+        downloadLog("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
         return saveToPlaylist(e);
       })
@@ -304,61 +305,35 @@ function createButton(text, action) {
   return button;
 }
 
-// console.error = function (message) {
-//   toastr.options = {
-//     "closeButton": false,
-//     "debug": false,
-//     "newestOnTop": false,
-//     "progressBar": false,
-//     "positionClass": "toast-top-right",
-//     "preventDuplicates": false,
-//     "onclick": null,
-//     "showDuration": "300",
-//     "hideDuration": "1000",
-//     "timeOut": "5000",
-//     "extendedTimeOut": "1000",
-//     "showEasing": "swing",
-//     "hideEasing": "linear",
-//     "showMethod": "fadeIn",
-//     "hideMethod": "fadeOut"
-//   }
-//   toastr.error(message);
-// }
+console.error = function (message) {
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+  toastr.error(message);
+}
 
 function log(message, type) {
   if (!type) {
     type = "info"
   }
-  toastr.error(message);
+  toastr[type](message);
 }
 
-console.log = function (message, type) {
-  if (message.isArray || typeof message === "object") {
-    console.warn(message);
-  } else {
-    toastr.options = {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    }
-    if (!type) type = "info";
-    toastr[type](message);
-  }
-}
-
-console.download = function (message, type, timeOut) {
+function downloadLog(message, type, timeOut) {
   if(!timeOut) {
     toastr.clear();
   }
