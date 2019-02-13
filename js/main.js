@@ -218,19 +218,19 @@ function downloadContent(manifestUri) {
  * complete.
  */
 
-async function donwloadVideos(playlistArray) {
-  downloadInProgress = true;
+function donwloadVideos(playlistArray) {
    // Disable the download button to prevent user from requesting
    // another download until this download is complete.
 
   setDownloadProgress(null, 0);
   var index = 0;
   var newplaylist = [];
-  for (var i = 0;i < playlistArray.length;i++) {
-    var url = playlistArray[i].video_link;
+  do {
+    downloadInProgress = true;
+    var url = playlistArray[index].video_link;
     console.warn(url);
     downloadLog("Downloading: " + url +"\n Please wait...", "info", true);
-    await downloadContent(url)
+    downloadContent(url)
       .then(function (e) {
         downloadLog("Dowloaded! \n" +url + " \n", "success", false);
         newplaylist.push(e);
@@ -251,7 +251,7 @@ async function donwloadVideos(playlistArray) {
         log(error);
         onError(error);
       });
-  };
+  } while (index < playlistArray.length && !downloadInProgress);
 }
 
 // Play the videos of latest playlist
