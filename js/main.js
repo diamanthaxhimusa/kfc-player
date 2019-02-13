@@ -237,7 +237,7 @@ function donwloadVideos(playlistArray, index) {
         return saveToPlaylist(e);
       })
       .then(function (content) {
-        // setDownloadProgress(null, 1);
+        setDownloadProgress(null, 1);
         index = index + 1;
         if (index == playlistArray.length) {
           window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
@@ -278,9 +278,8 @@ function updateOnlineStatus() {
  * have made.
  */
 function setDownloadProgress(content, progress) {
-  // var progressBar = document.getElementById('progress-bar');
-  // progressBar.value = progress * progressBar.max;
-  // console.downloadProgress(progress * 100);
+  var progressBar = $("#download-progress");
+  progressBar.html(Math.round(progress * 100) +'%');
 }
 
 /*
@@ -341,7 +340,7 @@ function downloadLog(message, type, timeOut) {
   }
   if (!type) type = "info";
   if (!timeOut) timeOut = false;
-  toastr[type](message, "", {
+  toastr[type](message + "<br><p><div id='download-progress'></div></p>", "", {
     "closeButton": false,
     "debug": false,
     "newestOnTop": false,
@@ -349,6 +348,7 @@ function downloadLog(message, type, timeOut) {
     "positionClass": "toast-top-right",
     "preventDuplicates": false,
     "onclick": null,
+    "escapeHTML": true,
     "showDuration": "300",
     "hideDuration": "1000",
     "timeOut": timeOut ? 0 : "5000",
