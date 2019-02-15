@@ -20,13 +20,30 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
+      position: relative;
+    }
+
+    #enter-exit-fs {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
+
+    #image-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 999;
+      display: none;
     }
   </style>
 </head>
 
-<body>
-  <!-- <span><progress id="progress-bar" value="0" max="100"></span> -->
-    <div class="video-container">
+<body id="body">
+    <div class="video-container" id="video-container">
       <video 
         id="video"
         class="video-player" 
@@ -35,13 +52,42 @@
         controls
         >
       </video>
+      <button id="enter-exit-fs" onclick="enterFullscreen()">Toggle fullscreen</button>
+      <div id="image-container"></div>
     </div>
-    
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
     <!-- Application source: --> 
     <script src="./js/main.js"></script>
+    <script>
+      document.cancelFullScreen = document.webkitExitFullscreen || document.exitFullscreen;
+
+      var elem = document.querySelector(document.webkitExitFullscreen ? "#body" : "#video-container");
+
+      function toggleFS(el) {
+        if (el.webkitEnterFullScreen) {
+          el.webkitEnterFullScreen();
+        } else {
+          el.requestFullscreen();
+        }
+        el.ondblclick = exitFullscreen;
+      }
+      // Note: FF nightly needs about:config full-screen-api.enabled set to true.
+      function enterFullscreen() {
+        if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else {
+          elem.requestFullscreen();
+        }
+        document.getElementById('enter-exit-fs').onclick = exitFullscreen;
+      }
+
+      function exitFullscreen() {
+        document.cancelFullScreen();
+        document.getElementById('enter-exit-fs').onclick = enterFullscreen;
+      }
+    </script>
 </body>
 </html>

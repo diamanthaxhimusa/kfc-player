@@ -35,6 +35,7 @@ function initPlayer() {
   // Create a Player instance.
   var video = document.getElementById('video');
   var player = new shaka.Player(video);
+  var preload = document.getElementById('preload');
 
   // Attach player and storage to the window to make it easy to access
   // in the JS console and so we can access it in other methods.
@@ -51,15 +52,13 @@ function initPlayer() {
 
   // refreshContentList();
 
-  // listContent()
-  //   .then(function (content) {
-  //     if (content.length) {
-  //       media = content;
-  //       player.load(content[vidId].offlineUri)
-  //     }
-  //   });
+  listContent()
+    .then(function (content) {
+      if (content.length) {
+        media = content;
+      }
+    });
 }
-
 
 function initPlaylist() {
   log("gettting data");
@@ -74,16 +73,23 @@ function initPlaylist() {
         var playlistUpdatedAt = playlistData.playlist.updated_at;
         var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
-          log("New videos! Downloading now...", "success");
-          window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
-          donwloadVideos(playlistData.playlist.media);
+          if (playlistData.playlist.type === "photo") {
+            log("New Image!", "success");
+            var poster = playlistData.playlist.media[0].image_url;
+            var duration = playlistData.playlist.media[0].duration || 4000;
+            showPhoto(poster, duration);
+          } else {
+            log("New videos! Downloading now...", "success");
+            window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
+            donwloadVideos(playlistData.playlist.media);
+          }
         } else {
           log("No new playlist. Playing from cache.", "warning");;
           playFromCache();
         }
       },
       error: function(error) {
-        console.error(error);
+        logError(error);
       }
     });  
   } else {
@@ -106,9 +112,10 @@ function getPlaylist() {
           var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
             if (playlistData.playlist.type === "photo") {
+              log("New Image!", "success");
               var poster = playlistData.playlist.media[0].image_url;
-              $("#video").attr("poster", poster);
-              $("#video").attr("src", "");
+              var duration = playlistData.playlist.media[0].duration || 4000;
+              showPhoto(poster, duration);
             } else {
               log("New videos! Downloading now...", "success");
               window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
@@ -128,20 +135,31 @@ function getPlaylist() {
   }
 }
 
+function showPhoto(url, duration) {
+  log("Showing Image");
+  $("#image-container").css({ backgroundImage: `url(${url})`, display: "block" });
+}
+
+function hidePhoto() {
+  log("Hiding Image");
+  $("#image-container").css({ display: "none" });
+}
 
 function playFromCache() {
   var cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
-  media = cachedplaylist.playlist;
-  player.load(media[vidId].offlineUri);
+  console.log(cachedplaylist);
+  // media = cachedplaylist.playlist;
+  window.player.load(media[vidId].offlineUri);
+  // preload.src = media[vidId].offlineUri;
 }
 
 
 function offline() {
-  log("You are offline!");
+  log("You are offline!", "error");
 }
 
 function online() {
-  log("You are back online!");
+  log("You are back online!", "success");
   // setTimeout(getPlaylist(), 10000);
 }
 
@@ -183,7 +201,7 @@ function initStorage(player) {
     progressCallback: setDownloadProgress,
     trackSelectionCallback: selectTracks
   });
-  window.storage.list().then(function(data){ log(data)});
+  window.storage.list().then(function(data){ console.log(data)});
   initPlaylist();
 }
 
@@ -234,13 +252,13 @@ function donwloadVideos(playlistArray, index) {
       .then(function (e) {
         downloadLog("Dowloaded! \n" + url + " \n", "success", false);
         newplaylist.push(e);
+        window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
         return saveToPlaylist(e);
       })
       .then(function (content) {
         setDownloadProgress(null, 1);
         index = index + 1;
         if (index == playlistArray.length) {
-          window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
           media = newplaylist;
           log("Playing the new playlist now!", "success");
           player.load(media[vidId].offlineUri);
@@ -258,6 +276,7 @@ function donwloadVideos(playlistArray, index) {
 
 // Play the videos of latest playlist
 function saveToPlaylist(e) {
+  console.log(e);
   return new Promise(function(resolve, reject){ resolve(playlist.push(e)) });
 }
 
@@ -286,12 +305,11 @@ function setDownloadProgress(content, progress) {
  * Clear our content table and repopulate it table with the current
  * list of downloaded content.
  */
-function refreshContentList() {
+function getContentList() {
   return listContent()
     .then(function (content) { 
-      log(content)
+      console.log(content)
       media.push(content);
-      // content.forEach(addRow); 
     });
 };
 
@@ -306,7 +324,7 @@ function createButton(text, action) {
   return button;
 }
 
-console.error = function (message) {
+function logError(message) {
   toastr.options = {
     "closeButton": false,
     "debug": false,
