@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Settings</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <div class="registrationContainer">
+    <img id="img" src="https://wl3-cdn.landsec.com/sites/default/files/images/shops/logos/kfc.png" alt="Smiley face" />
+    <div class="panel">
+      <h1 class="setup">Settings</h1>
+      <div class="column">
+        <div id="settings-container" class="inputSelect">
+          <span class="span">Debug Mode:</span>
+          <input type="checkbox" name="debug-mode-input" id="debug-mode-input" value="">
+          <label for="debug-mode-input"></label>
+        </div>
+        <div id="settings-container" class="inputSelect">
+          <span class="span">Clear Screen Data:</span>
+          <a href="javascript:;" style="flex: 0.7;text-align: center;" onclick="clearData()">Clear Data</a>
+        </div>
+      </div>
+    </div>
+    <button class="button" id="go" onclick="save()">Save</button>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var debugMode = JSON.parse(localStorage.getItem("kfc_debug_mode"));
+      if (debugMode) {
+        $("#debug-mode-input").click();
+      }
+    });
+    
+    function save() {
+      var debugMode = document.querySelector("input").checked;
+      localStorage.setItem("kfc_debug_mode", debugMode);
+      window.location.href = window.location.origin + "/video.html";
+    }
+
+    function clearData() {
+      localStorage.setItem("kfc_screen", null);
+    }
+  </script>
+</body>
+
+</html>

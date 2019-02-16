@@ -1,14 +1,22 @@
 var media = [];
 var playlist = [];
 var vidId = 0;
-var vidUrl = "https://kfc.urbanway.net";
+var screen;
+var kfcDebugMode;
+var vidUrl = "http://kfc.uws.al/";
 var corsUrl = "https://cors-anywhere.herokuapp.com/";
-var playlistUrl = "https://my-json-server.typicode.com/diamanthaxhimusa/kfcadmin/db";
+// var playlistUrl = "https://my-json-server.typicode.com/diamanthaxhimusa/kfcadmin/db";
+var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
 var downloadInProgress = false;
 
 function initApp() {
+  screen = JSON.parse(localStorage.getItem("kfc_screen"));
+  kfcDebugMode = JSON.parse(localStorage.getItem("kfc_debug_mode"));
+  if (!screen) {
+    window.location.href = window.location.origin;
+  }
   dw1 = document.getElementById('download-button');
   dw2 = document.getElementById('dwnbtn');
 
@@ -64,25 +72,17 @@ function initPlaylist() {
   log("gettting data");
   if (navigator.onLine) {
     $.ajax({
-      url: corsUrl+playlistUrl,
+      url: corsUrl + playlistUrl + screen.screen,
       type: 'GET',
       dataType: 'json',
       success: function(data) {
-        console.warn(data);
-        var playlistData = data.data;
-        var playlistUpdatedAt = playlistData.playlist.updated_at;
+        var playlistData = data;
+        var playlistUpdatedAt = playlistData.updated_at;
         var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
-          if (playlistData.playlist.type === "photo") {
-            log("New Image!", "success");
-            var poster = playlistData.playlist.media[0].image_url;
-            var duration = playlistData.playlist.media[0].duration || 4000;
-            showPhoto(poster, duration);
-          } else {
             log("New videos! Downloading now...", "success");
             window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
-            donwloadVideos(playlistData.playlist.media);
-          }
+            donwloadVideos(playlistData.playlist);
         } else {
           log("No new playlist. Playing from cache.", "warning");;
           playFromCache();
@@ -103,24 +103,17 @@ function getPlaylist() {
     if (!downloadInProgress) {
       log("Checking for new playlist.");
       $.ajax({
-        url: corsUrl+playlistUrl,
+        url: corsUrl + playlistUrl + screen.screen,
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-          var playlistData = data.data;
-          var playlistUpdatedAt = playlistData.playlist.updated_at;
+          var playlistData = data;
+          var playlistUpdatedAt = playlistData.updated_at;
           var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
-            if (playlistData.playlist.type === "photo") {
-              log("New Image!", "success");
-              var poster = playlistData.playlist.media[0].image_url;
-              var duration = playlistData.playlist.media[0].duration || 4000;
-              showPhoto(poster, duration);
-            } else {
               log("New videos! Downloading now...", "success");
               window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
-              donwloadVideos(playlistData.playlist.media);
-            }
+              donwloadVideos(playlistData.playlist);
           } else {
             log("There is no new playlist. Playing the old one");
           }
@@ -239,13 +232,12 @@ function downloadContent(manifestUri) {
 function donwloadVideos(playlistArray, index) {
   // Disable the download button to prevent user from requesting
   // another download until this download is complete.
-  var index = index;
   if (!index) index = 0;
   if (index < playlistArray.length && !downloadInProgress) {
     setDownloadProgress(null, 0);
     var newplaylist = [];
     downloadInProgress = true;
-    var url = playlistArray[index].video_link;
+    var url = corsUrl + vidUrl + playlistArray[index];
     console.warn(url);
     downloadLog("Downloading: " + url + "\n Please wait...", "info", true);
     downloadContent(url)
@@ -325,6 +317,7 @@ function createButton(text, action) {
 }
 
 function logError(message) {
+  if (!kfcDebugMode) return;
   toastr.options = {
     "closeButton": false,
     "debug": false,
@@ -346,6 +339,7 @@ function logError(message) {
 }
 
 function log(message, type) {
+  if (!kfcDebugMode) return;
   if (!type) {
     type = "info"
   }
@@ -353,6 +347,7 @@ function log(message, type) {
 }
 
 function downloadLog(message, type, timeOut) {
+  if (!kfcDebugMode) return;
   if(!timeOut) {
     toastr.clear();
   }

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-  
-  <head>
-    <link rel="stylesheet" href="./css/style.css">
+<head>
+  <title>Configuration</title>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
@@ -11,28 +11,65 @@
     <div class="panel">
       <h1 class="setup">Set up the Screen</h1>
       <div class="column">
-        <div class="inputSelect">
+        <div id="location-picker-container" class="inputSelect">
           <span class="span">Select Location:</span>
-          <select wrap value={this.state.location} onChange={this.onLocationChange} class="picker">
-            <!-- <script>
-              ['Royal Mall', 'Albi Mall', 'Ferizaj Village', 'Emerald', 'Prizren', 'Gjilan'].map(item => (document.write(`<option value="${item}"">${item}</option>`)))
-            </script> -->
+          <select class="picker" id="location-picker">
+            <option value="" disabled selected>Select...</option>
           </select>
         </div>
-        <div class="inputSelect">
+        <div id="screen-picker-container" class="inputSelect">
           <span class="span">Select Screen:</span>
-          <select wrap value={this.state.screen} onChange={this.onScreenChange} class="picker">
-            <!-- <script>
-              ['1', '2', '3', '4', '5', '6', '7', '8'].map(item => (document.write(`<option value="${item}"">${item}</option>`)))
-            </script> -->
+          <select id="screen-picker" class="picker">
+            <option value="" disabled selected>Select...</option>
           </select>
         </div>
+        <img src="./ajax-loader.gif" id="ajax-loader">
       </div>
     </div>
-    <a class="button" href="./video.html">
-      Go
-    </a>
+    <button class="button" id="go" onclick="proceedToVideo()" disabled>Go</button>
   </div>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+  var corsUrl = "https://cors-anywhere.herokuapp.com/";
+  $(document).ready(function() {
+    $.ajax({
+      method: "GET",
+      url: corsUrl+"http://kfc.uws.al/api/v1/locations",
+      success: function(data) {
+        $("#location-picker-container").addClass("data");
+        for(i=0;i<data.length;i++) {
+          var item = data[i];
+          $("#location-picker").append("<option value='"+item.id+"'>" + item.name +"</option>");
+        };
+        $("#ajax-loader").hide();
+      }
+    });
+  });
+  $("#location-picker").change(function() {
+    var locationId = $("#location-picker").val();
+    $("#ajax-loader").show();
+    $.ajax({
+      method: "GET",
+      url: corsUrl + "http://kfc.uws.al/api/v1/locations/" + locationId,
+      success: function (data) {
+        $("#screen-picker-container").addClass("data");
+        for (i = 0; i < data.screens.length; i++) {
+          var item = data.screens[i];
+          $("#screen-picker").append("<option value='"+item.playlist_id+"'>"+item.number+"</option>");
+        };
+        $("#ajax-loader").hide();
+      }
+    });
+  });
+  $("#screen-picker").change(function() { $("#go").removeAttr("disabled"); });
+
+  async function proceedToVideo() {
+    var locationId = $("#location-picker").val();
+    var screenId = $("#screen-picker").val();
+    var obj = { "location": locationId, "screen": screenId };
+    await localStorage.setItem("kfc_screen", JSON.stringify(obj));
+    window.location.href =  window.location.href + "video.html";
+  }
+</script>
 </body>
 </html>
