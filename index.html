@@ -65,11 +65,11 @@
   });
   $("#screen-picker").change(function() { $("#go").removeAttr("disabled"); });
 
-  async function proceedToVideo() {
+  function proceedToVideo() {
     var locationId = $("#location-picker").val();
     var screenId = $("#screen-picker").val();
     var obj = { "location": locationId, "screen": screenId };
-    await localStorage.setItem("kfc_screen", JSON.stringify(obj));
+    localStorage.setItem("kfc_screen", JSON.stringify(obj));
     window.location.href =  window.location.href + "video.html";
   }
 </script>
