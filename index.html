@@ -32,6 +32,8 @@
 <script>
   var corsUrl = "https://cors-anywhere.herokuapp.com/";
   $(document).ready(function() {
+    var screen = JSON.parse(localStorage.getItem("kfc_screen"));
+    if (screen) window.location.href = window.location.href + "video.html";
     $.ajax({
       method: "GET",
       url: corsUrl+"http://kfc.uws.al/api/v1/locations",

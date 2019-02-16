@@ -128,16 +128,6 @@ function getPlaylist() {
   }
 }
 
-function showPhoto(url, duration) {
-  log("Showing Image");
-  $("#image-container").css({ backgroundImage: `url(${url})`, display: "block" });
-}
-
-function hidePhoto() {
-  log("Hiding Image");
-  $("#image-container").css({ display: "none" });
-}
-
 function playFromCache() {
   var cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
   console.log(cachedplaylist);

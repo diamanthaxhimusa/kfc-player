@@ -10,55 +10,56 @@
 </head>
 
 <body id="body">
-    <div class="video-container" id="video-container">
-      <video 
-        id="video"
-        class="video-player" 
-        poster="https://wallpapersdsc.net/wp-content/uploads/2016/09/KFC-4K.png"
-        autoPlay
-        >
-      </video>
-      <div id="player-buttons">
-        <button id="enter-exit-fs" onclick="enterFullscreen()">Toggle fullscreen</button>
-        <button id="enter-settings" onclick="enterSettings()">Settings</button>
-      </div>
-      <div id="image-container"></div>
+  <div class="video-container" id="video-container">
+    <video 
+      id="video"
+      class="video-player"
+      autoPlay
+      >
+    </video>
+    <div id="player-buttons">
+      <button id="enter-exit-fs" onclick="enterFullscreen()">Toggle fullscreen</button>
+      <button id="enter-settings" onclick="enterSettings()">Settings</button>
     </div>
-    <script src="./js/jquery-3.3.1.min.js"></script>
-    <script src="./js/toastr.min.js"></script>
-    <!-- Application source: --> 
-    <script src="./js/main.js"></script>
-    <script>
-      document.cancelFullScreen = document.webkitExitFullscreen || document.exitFullscreen;
+    <div id="image-container"></div>
+  </div>
+<script src="./js/jquery-3.3.1.min.js"></script>
+<script src="./js/toastr.min.js"></script>
+<!-- Application source: --> 
+<script src="./js/main.js"></script>
+<script src="https://js.pusher.com/4.4/pusher.min.js"></script>
+<script src="./js/socket.js"></script>
+<script>
+  document.cancelFullScreen = document.webkitExitFullscreen || document.exitFullscreen;
 
-      var elem = document.querySelector(document.webkitExitFullscreen ? "#body" : "#video-container");
+  var elem = document.querySelector(document.webkitExitFullscreen ? "#body" : "#video-container");
 
-      function toggleFS(el) {
-        if (el.webkitEnterFullScreen) {
-          el.webkitEnterFullScreen();
-        } else {
-          el.requestFullscreen();
-        }
-        el.ondblclick = exitFullscreen;
-      }
-      // Note: FF nightly needs about:config full-screen-api.enabled set to true.
-      function enterFullscreen() {
-        if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-        } else {
-          elem.requestFullscreen();
-        }
-        document.getElementById('enter-exit-fs').onclick = exitFullscreen;
-      }
+  function toggleFS(el) {
+    if (el.webkitEnterFullScreen) {
+      el.webkitEnterFullScreen();
+    } else {
+      el.requestFullscreen();
+    }
+    el.ondblclick = exitFullscreen;
+  }
+  // Note: FF nightly needs about:config full-screen-api.enabled set to true.
+  function enterFullscreen() {
+    if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    } else {
+      elem.requestFullscreen();
+    }
+    document.getElementById('enter-exit-fs').onclick = exitFullscreen;
+  }
 
-      function exitFullscreen() {
-        document.cancelFullScreen();
-        document.getElementById('enter-exit-fs').onclick = enterFullscreen;
-      }
+  function exitFullscreen() {
+    document.cancelFullScreen();
+    document.getElementById('enter-exit-fs').onclick = enterFullscreen;
+  }
 
-      function enterSettings() {
-        window.location.href = window.location.origin + "/settings.html";
-      }
-    </script>
+  function enterSettings() {
+    window.location.href = window.location.origin + "/settings.html";
+  }
+</script>
 </body>
 </html>
