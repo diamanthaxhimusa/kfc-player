@@ -10,10 +10,12 @@ var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
 var downloadInProgress = false;
+var lastCachedPlaylist = [];
 
 function initApp() {
   screen = JSON.parse(localStorage.getItem("kfc_screen"));
   kfcDebugMode = JSON.parse(localStorage.getItem("kfc_debug_mode"));
+  lastCachedPlaylist = JSON.parse(localStorage.getItem("cached_playlist"));
   if (!screen) {
     window.location.href = window.location.origin;
   }
@@ -161,8 +163,9 @@ function onErrorEvent(event) {
 }
 
 function onError(error) {
+  console.log(error)
   // Log the error.
-  log('Error code :' + error.code + '; Data:' + error.data, "error");
+  logError('Error code :' + error.code + '; Data:' + error.data);
 }
 
 function selectTracks(tracks) {
@@ -225,7 +228,6 @@ function donwloadVideos(playlistArray, index) {
   if (!index) index = 0;
   if (index < playlistArray.length && !downloadInProgress) {
     setDownloadProgress(null, 0);
-    var newplaylist = [];
     downloadInProgress = true;
     var url = corsUrl + vidUrl + playlistArray[index];
     console.warn(url);
@@ -233,15 +235,15 @@ function donwloadVideos(playlistArray, index) {
     downloadContent(url)
       .then(function (e) {
         downloadLog("Dowloaded! \n" + url + " \n", "success", false);
-        newplaylist.push(e);
-        window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newplaylist }));
         return saveToPlaylist(e);
       })
       .then(function (content) {
         setDownloadProgress(null, 1);
         index = index + 1;
         if (index == playlistArray.length) {
-          media = newplaylist;
+          console.log(lastCachedPlaylist)
+          console.log("media", media);
+          storeDeleteAsset();
           log("Playing the new playlist now!", "success");
           player.load(media[vidId].offlineUri);
         } else {
@@ -255,6 +257,37 @@ function donwloadVideos(playlistArray, index) {
       });
   }
 }
+
+
+function storeDeleteAsset() {
+  window.storage.configure(({progressCallback: function (data, percent) {}}));
+  if (storage) {
+    storage.list()
+    .then(function (content) {
+      for (var contentIndex = 0; contentIndex < content.length; contentIndex++) {
+        for (var j = 0; j < media.length;j++) {
+          if (media[j] && content[contentIndex].originalManifestUri == media[j].originalManifestUri) {
+            var offlineUri = content[contentIndex].offlineUri;
+            console.log("offline uri")
+            console.log(offlineUri);
+            return storage.remove(offlineUri).then(function (data) {
+              log("Video deleted successfuly!", "success");
+              console.log("media", media)
+              media.shift();
+              console.log("media shifted", media)
+              window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: content }));
+              storeDeleteAsset()
+            }).catch(function (reason) {
+              var error = (reason);
+              onError(error);
+            });
+          }
+        }
+      }
+    });
+  }
+};
+
 
 // Play the videos of latest playlist
 function saveToPlaylist(e) {
