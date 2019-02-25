@@ -128,6 +128,12 @@ button#go:active {
   position: relative;
 }
 
+#instant-image {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
 #player-buttons {
   position: absolute;
   top: 10px;

@@ -5,7 +5,6 @@ var screen;
 var kfcDebugMode;
 var vidUrl = "http://kfc.uws.al/";
 var corsUrl = "https://cors-anywhere.herokuapp.com/";
-// var playlistUrl = "https://my-json-server.typicode.com/diamanthaxhimusa/kfcadmin/db";
 var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
@@ -187,7 +186,7 @@ function initStorage(player) {
     progressCallback: setDownloadProgress,
     trackSelectionCallback: selectTracks
   });
-  window.storage.list().then(function(data){ console.log(data)});
+  window.storage.list().then(function(data){ media = data;console.log(data)});
   initPlaylist();
 }
 
@@ -245,7 +244,7 @@ function donwloadVideos(playlistArray, index) {
           console.log("media", media);
           storeDeleteAsset();
           log("Playing the new playlist now!", "success");
-          player.load(media[vidId].offlineUri);
+          playContent(media[vidId]);
         } else {
           downloadInProgress = false;
           donwloadVideos(playlistArray, index);
@@ -257,7 +256,6 @@ function donwloadVideos(playlistArray, index) {
       });
   }
 }
-
 
 function storeDeleteAsset() {
   window.storage.configure(({progressCallback: function (data, percent) {}}));
@@ -274,7 +272,7 @@ function storeDeleteAsset() {
               log("Video deleted successfuly!", "success");
               console.log("media", media)
               media.shift();
-              console.log("media shifted", media)
+              console.log("media shifted", content)
               window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: content }));
               storeDeleteAsset()
             }).catch(function (reason) {
