@@ -53,12 +53,16 @@
       method: "GET",
       url: corsUrl + "http://kfc.uws.al/api/v1/locations/" + locationId,
       success: function (data) {
+        console.log(data)
         $("#screen-picker-container").addClass("data");
         for (i = 0; i < data.screens.length; i++) {
           var item = data.screens[i];
           $("#screen-picker").append("<option value='"+item.playlist_id+"'>"+item.number+"</option>");
         };
         $("#ajax-loader").hide();
+      },
+      error: function(error) {
+        console.log(error)
       }
     });
   });

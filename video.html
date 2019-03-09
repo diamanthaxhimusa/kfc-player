@@ -15,14 +15,18 @@
       id="video"
       class="video-player"
       autoPlay
+      controls
       >
     </video>
     <div id="player-buttons">
       <button id="enter-exit-fs" onclick="enterFullscreen()">Toggle fullscreen</button>
       <button id="enter-settings" onclick="enterSettings()">Settings</button>
     </div>
-    <div id="image-container">
+    <div class="image-container" id="image-container">
       <img id="instant-image" src="">
+    </div>
+    <div class="image-container" id="playlist-image-container">
+      <img id="playlist-image" src="">
     </div>
   </div>
 <script src="./js/jquery-3.3.1.min.js"></script>

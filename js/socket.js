@@ -44,7 +44,8 @@ function checkForInstaImage() {
       type: 'GET',
       dataType: 'json',
       success: function (data) {
-        imageUri = data[0].image;
+        console.log("socket", data)
+        imageUri = data.image;
         var lastInstaImage = window.localStorage.getItem('kfc_instant_last');
         if (lastInstaImage != imageUri) {
           window.localStorage.setItem('kfc_instant_last', imageUri);

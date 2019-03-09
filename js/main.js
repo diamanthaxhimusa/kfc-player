@@ -3,7 +3,7 @@ var playlist = [];
 var vidId = 0;
 var screen;
 var kfcDebugMode;
-var vidUrl = "http://kfc.uws.al/";
+var vidUrl = "http://kfc.uws.al";
 var corsUrl = "https://cors-anywhere.herokuapp.com/";
 var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
@@ -77,16 +77,25 @@ function initPlaylist() {
       type: 'GET',
       dataType: 'json',
       success: function(data) {
+        console.log(data);
         var playlistData = data;
         var playlistUpdatedAt = playlistData.updated_at;
         var lastupdated = window.localStorage.getItem('kfc_updated');
         if (lastupdated != playlistUpdatedAt) {
             log("New videos! Downloading now...", "success");
             window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
-            donwloadVideos(playlistData.playlist);
+            if (playlistData.photo) {
+              displayImage(playlistData.photo)
+            } else {
+              donwloadVideos(playlistData.playlist);
+            }
         } else {
-          log("No new playlist. Playing from cache.", "warning");;
-          playFromCache();
+          log("No new playlist. Playing from cache.", "warning");
+          if (playlistData.photo) {
+            displayImage(playlistData.photo);
+          } else {
+            playFromCache();
+          }
         }
       },
       error: function(error) {
@@ -112,9 +121,13 @@ function getPlaylist() {
           var playlistUpdatedAt = playlistData.updated_at;
           var lastupdated = window.localStorage.getItem('kfc_updated');
           if (lastupdated != playlistUpdatedAt) {
+            window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
+            if (playlistData.photo) {
+              displayImage(playlistData.photo)
+            } else {
               log("New videos! Downloading now...", "success");
-              window.localStorage.setItem('kfc_updated', playlistUpdatedAt);
               donwloadVideos(playlistData.playlist);
+            }
           } else {
             log("There is no new playlist. Playing the old one");
           }
@@ -145,6 +158,27 @@ function offline() {
 function online() {
   log("You are back online!", "success");
   // setTimeout(getPlaylist(), 10000);
+}
+
+function displayImage(image) {
+  console.log("showPhoto: " + image);
+  imageUri = image;
+  var image = document.getElementById("playlist-image");
+  var downloadingImage = new Image();
+  downloadingImage.onload = function () {
+    console.log("Playlist photo ready");
+    image.src = this.src;
+    displayPhoto();
+  };
+  downloadingImage.src = baseImageUri + imageUri;
+}
+
+function displayPhoto() {
+  $("#playlist-image-container").css({ display: "block" });
+}
+
+function removePhoto() {
+  $("#playlist-image-container").css({ display: "none" });
 }
 
 function onEndEvent(event) {
@@ -195,7 +229,21 @@ function listContent() {
 }
 
 function playContent(content) {
-  window.player.load(content.offlineUri);
+  removePhoto()
+  window.storage.list().then(function (data) { 
+    media = data; 
+    window.player.load(data[0].offlineUri);
+    if (!lastCachedPlaylist) {
+      initNewCachedPlaylist()
+    }
+  });
+}
+
+function initNewCachedPlaylist() {
+  console.log("initNewCachedPlaylist")
+  window.storage.list().then(function (data) {
+    window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: data })); 
+  });
 }
 
 function removeContent(content) {
@@ -244,6 +292,9 @@ function donwloadVideos(playlistArray, index) {
           console.log("media", media);
           storeDeleteAsset();
           log("Playing the new playlist now!", "success");
+          console.log("Playing the new playlist now!", "success");
+          console.log(media);
+          downloadInProgress = false;
           playContent(media[vidId]);
         } else {
           downloadInProgress = false;
@@ -259,19 +310,24 @@ function donwloadVideos(playlistArray, index) {
 
 function storeDeleteAsset() {
   window.storage.configure(({progressCallback: function (data, percent) {}}));
-  if (storage) {
+  var cached_media = JSON.parse(window.localStorage.getItem("cached_playlist"));
+  console.log("--- storeDeleteAsset ---")
+  if (storage && mediaCached) {
+    console.log("cached_media", cached_media)
+    var mediaCached = cached_media.playlist;
     storage.list()
     .then(function (content) {
       for (var contentIndex = 0; contentIndex < content.length; contentIndex++) {
-        for (var j = 0; j < media.length;j++) {
-          if (media[j] && content[contentIndex].originalManifestUri == media[j].originalManifestUri) {
+        for (var j = 0; j < mediaCached.length;j++) {
+          console.log('deleting media', mediaCached);
+          if (mediaCached[j] && content[contentIndex].originalManifestUri == mediaCached[j].originalManifestUri) {
             var offlineUri = content[contentIndex].offlineUri;
             console.log("offline uri")
             console.log(offlineUri);
             return storage.remove(offlineUri).then(function (data) {
               log("Video deleted successfuly!", "success");
-              console.log("media", media)
-              media.shift();
+              console.log("media", mediaCached)
+              mediaCached.shift();
               console.log("media shifted", content)
               window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: content }));
               storeDeleteAsset()
@@ -397,7 +453,7 @@ function downloadLog(message, type, timeOut) {
 window.setInterval(function () {
   /// call your function here
   getPlaylist();
-}, 40000);
+}, 4000);
 
 // dT = new Date(Date.now() + 1 * 60000) - new Date();
 // dT = new Date("Sun Feb 10 2019 14:45:21 GMT+0100 (CET)") - new Date();
