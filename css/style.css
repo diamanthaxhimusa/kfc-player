@@ -139,6 +139,9 @@ button#go:active {
   top: 10px;
   left: 10px;
   z-index: 1000;
+  width: 200px;
+  height: 70px;
+  opacity: 0;
 }
 
 .image-container {

@@ -4,7 +4,7 @@ var vidId = 0;
 var screen;
 var kfcDebugMode;
 var vidUrl = "http://kfc.uws.al";
-var corsUrl = "https://cors-anywhere.herokuapp.com/";
+var corsUrl = "";
 var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
@@ -233,8 +233,11 @@ function playContent(content) {
   window.storage.list().then(function (data) { 
     media = data; 
     window.player.load(data[0].offlineUri);
+    console.log("--- play content ----", lastCachedPlaylist)
     if (!lastCachedPlaylist) {
       initNewCachedPlaylist()
+    } else {
+      // storeDeleteAsset();
     }
   });
 }
@@ -242,6 +245,8 @@ function playContent(content) {
 function initNewCachedPlaylist() {
   console.log("initNewCachedPlaylist")
   window.storage.list().then(function (data) {
+    console.log("init cache playlist: ", data);
+    lastCachedPlaylist = data;
     window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: data })); 
   });
 }
@@ -290,10 +295,11 @@ function donwloadVideos(playlistArray, index) {
         if (index == playlistArray.length) {
           console.log(lastCachedPlaylist)
           console.log("media", media);
-          storeDeleteAsset();
           log("Playing the new playlist now!", "success");
           console.log("Playing the new playlist now!", "success");
           console.log(media);
+          console.log("--- play content ----", lastCachedPlaylist)
+          storeDeleteAsset(media.slice(0, media.length));
           downloadInProgress = false;
           playContent(media[vidId]);
         } else {
@@ -311,10 +317,11 @@ function donwloadVideos(playlistArray, index) {
 function storeDeleteAsset() {
   window.storage.configure(({progressCallback: function (data, percent) {}}));
   var cached_media = JSON.parse(window.localStorage.getItem("cached_playlist"));
-  console.log("--- storeDeleteAsset ---")
-  if (storage && mediaCached) {
-    console.log("cached_media", cached_media)
-    var mediaCached = cached_media.playlist;
+  console.log("--- storeDeleteAsset ---", cached_media)
+  console.log(storage, cached_media, storage && cached_media)
+  if (storage && media) {
+    console.log("media", media)
+    var mediaCached = media.slice(0, media.length);
     storage.list()
     .then(function (content) {
       for (var contentIndex = 0; contentIndex < content.length; contentIndex++) {
@@ -328,13 +335,18 @@ function storeDeleteAsset() {
               log("Video deleted successfuly!", "success");
               console.log("media", mediaCached)
               mediaCached.shift();
+              media = mediaCached;
               console.log("media shifted", content)
+              console.log("--- mediaaa: ", media)
+              content.shif();
               window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: content }));
               storeDeleteAsset()
             }).catch(function (reason) {
               var error = (reason);
               onError(error);
             });
+          } else {
+            playContent()
           }
         }
       }

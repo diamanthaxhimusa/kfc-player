@@ -36,6 +36,18 @@
 <script src="https://js.pusher.com/4.4/pusher.min.js"></script>
 <script src="./js/socket.js"></script>
 <script>
+  var playButtons = document.getElementById("player-buttons");
+  console.log(playButtons)
+  playButtons.addEventListener("mouseover", function (event) {
+    // highlight the mouseenter target
+    $('#player-buttons').css('opacity', '1');
+
+    }, false);
+  playButtons.addEventListener("mouseout", function (event) {
+      // highlight the mouseenter target
+      $('#player-buttons').css('opacity', '0');
+
+    }, false);
   document.cancelFullScreen = document.webkitExitFullscreen || document.exitFullscreen;
 
   var elem = document.querySelector(document.webkitExitFullscreen ? "#body" : "#video-container");
@@ -64,7 +76,7 @@
   }
 
   function enterSettings() {
-    window.location.href = window.location.origin + "/settings.html";
+    window.location.href = window.location.origin + "settings.html";
   }
 </script>
 </body>
