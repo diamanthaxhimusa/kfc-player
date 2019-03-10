@@ -4,7 +4,7 @@ var vidId = 0;
 var screen;
 var kfcDebugMode;
 var vidUrl = "http://kfc.uws.al";
-var corsUrl = "";
+var corsUrl = "https://cors-anywhere.herokuapp.com/";
 var playlistUrl = "http://kfc.uws.al/api/v1/screens/";
 var vid1 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/sintel-mp4-only/dash.mpd";
 var vid2 = corsUrl + "https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd";
@@ -145,9 +145,15 @@ function getPlaylist() {
 function playFromCache() {
   var cachedplaylist = JSON.parse(window.localStorage.getItem("cached_playlist"));
   console.log(cachedplaylist);
-  // media = cachedplaylist.playlist;
+  media = cachedplaylist.playlist;
   window.player.load(media[vidId].offlineUri);
   // preload.src = media[vidId].offlineUri;
+  var video = document.getElementById('video');
+  if (cachedplaylist.playlist.length === 1) {
+    video.loop = true;
+  } else {
+    video.loop = false;
+  }
 }
 
 
@@ -322,6 +328,7 @@ function storeDeleteAsset() {
   if (storage && media) {
     console.log("media", media)
     var mediaCached = media.slice(0, media.length);
+    var deleted = 0;
     storage.list()
     .then(function (content) {
       for (var contentIndex = 0; contentIndex < content.length; contentIndex++) {
@@ -333,14 +340,16 @@ function storeDeleteAsset() {
             console.log(offlineUri);
             return storage.remove(offlineUri).then(function (data) {
               log("Video deleted successfuly!", "success");
-              console.log("media", mediaCached)
               mediaCached.shift();
-              media = mediaCached;
+              deleted = deleted + 1;
               console.log("media shifted", content)
-              console.log("--- mediaaa: ", media)
-              content.shif();
-              window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: content }));
-              storeDeleteAsset()
+              if (mediaCached.length === 0) {
+                storage.list()
+                  .then(function (newContent) {
+                    window.localStorage.setItem("cached_playlist", JSON.stringify({ playlist: newContent }));
+                    playFromCache();
+                  })
+              }
             }).catch(function (reason) {
               var error = (reason);
               onError(error);
@@ -406,6 +415,7 @@ function createButton(text, action) {
 }
 
 function logError(message) {
+  console.log(message)
   if (!kfcDebugMode) return;
   toastr.options = {
     "closeButton": false,

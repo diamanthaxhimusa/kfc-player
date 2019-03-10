@@ -1,7 +1,7 @@
 var wsUri = "wss://kfc.uws.al:6001";
 var instantImagesUri = "http://kfc.uws.al/api/v1/breakingnews/";
 var baseImageUri = "http://kfc.uws.al/videos/";
-var corsUrl = "";
+var corsUrl = "https://cors-anywhere.herokuapp.com/";
 var imageUri = localStorage.getItem("kfc_instant_image") || null;
 
 function init() {
